@@ -1,12 +1,12 @@
 %global _default_patch_fuzz 2
-%global commitdate 20250310
-%global commit d25836aa10b3f21b5434a6bddac18d4900a16d16
+%global commitdate 20250522
+%global commit 241ec8c7b85d27598b0d04c4d421f64b97224671
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %define _disable_source_fetch 0
 
 Name:           scx-scheds-git
-Version:        1.0.10.%{commitdate}.git.%{shortcommit}
+Version:        1.0.12.%{commitdate}.git.%{shortcommit}
 Release:        1%{?dist}
 Summary:        Sched_ext Schedulers and Tools
 
@@ -30,10 +30,14 @@ BuildRequires:  jq
 BuildRequires:  jq-devel
 BuildRequires:  systemd
 BuildRequires:  bpftool
+BuildRequires:  protobuf-compiler
+BuildRequires:  libseccomp-devel
 Requires:  elfutils-libelf
+Requires:  libseccomp
+Requires:  protobuf
 Requires:  zlib
 Requires:  jq
-Obsoletes: scxctl
+Obsoletes: scxctl >= 0.3.4
 Conflicts: scx-scheds
 Conflicts: scx_layered
 Conflicts: scx_rustland

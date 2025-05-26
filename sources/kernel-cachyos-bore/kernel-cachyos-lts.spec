@@ -1,5 +1,3 @@
-# Maintainer: Eric Naim <dnaim@cachyos.org>
-
 # Fedora bits
 %define __spec_install_post %{__os_install_post}
 %define _build_id_links none
@@ -13,7 +11,7 @@
 
 # Linux Kernel Versions
 %define _basekver 6.12
-%define _stablekver 18
+%define _stablekver 30
 %define _rpmver %{version}-%{release}
 %define _kver %{_rpmver}.%{_arch}
 
@@ -34,12 +32,12 @@
 # Builds nvidia-open kernel modules with
 # the kernel
 %define _nv_pkg open-gpu-kernel-modules-%{_nv_ver}
-%if 0%{?fedora} >= 42
-    %define _build_nv 0
-    %define _nv_ver 570.86.16
+%if 0%{?fedora} >= 43
+    %define _build_nv 1
+    %define _nv_ver 575.51.02
 %else
     %define _build_nv 1
-    %define _nv_ver 570.86.16
+    %define _nv_ver 570.144
     %define _nv_old 1
 %endif
 
@@ -136,7 +134,10 @@ Patch2:         %{_patch_src}/misc/dkms-clang.patch
 %endif
 
 %if %{_build_nv}
-Patch10:        %{_patch_src}/misc/nvidia/0001-Make-modeset-and-fbdev-default-enabled.patch
+Patch10:        %{_patch_src}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-by-default.patch
+%if !%{_build_lto}
+Patch11:        https://raw.githubusercontent.com/CachyOS/copr-linux-cachyos/refs/heads/master/sources/kernel-cachyos-bore/patches/nvidia/%{_nv_ver}/nvidia-gcc15.patch
+%endif
 %endif
 
 %description
@@ -386,6 +387,7 @@ Provides:       kernel-modules-extra = %{_rpmver}
 Provides:       kernel-modules-uname-r = %{_kver}
 Provides:       kernel-modules-core-uname-r = %{_kver}
 Provides:       kernel-modules-extra-uname-r = %{_kver}
+Provides:       v4l2loopback-kmod = 0.13.1
 Provides:       installonlypkg(kernel-module)
 Requires:       kernel-uname-r = %{_kver}
 
