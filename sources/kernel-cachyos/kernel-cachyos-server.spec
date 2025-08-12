@@ -47,14 +47,14 @@
 # Valid values: 100, 250, 300, 500, 600, 750 and 1000
 # An invalid value will not fail and continue to use
 # 1000Hz tickrate
-%define _hz_tick 1000
+%define _hz_tick 300
 
 # Defines the x86_64 ISA level used
 # to compile the kernel
 # Valid values are 1-4
 # An invalid value will continue and use
 # x86_64_v3
-%define _x86_64_lvl 3
+%define _x86_64_lvl 2
 
 # Define variables for directory paths
 # to be used during packaging
@@ -70,19 +70,19 @@
 
 %define _module_args KERNEL_UNAME=%{_kver} IGNORE_PREEMPT_RT_PRESENCE=1 SYSSRC=%{_builddir}/linux-%{_tarkver} SYSOUT=%{_builddir}/linux-%{_tarkver}
 
-Name:           kernel-cachyos-rt%{?_lto_args:-lto}
-Summary:        Linux BORE %{?_lto_args:+ LTO }Cachy Sauce Kernel by CachyOS with other patches and improvements.
+Name:           kernel-cachyos-server%{?_lto_args:-lto}
+Summary:        Linux %{?_lto_args:+ LTO }EEVDF scheduler Kernel by CachyOS targeted for Servers workloads
 Version:        %{_basekver}.%{_stablekver}
-Release:        cachyrt2%{?_lto_args:.lto}%{?dist}
+Release:        cachyserver2%{?_lto_args:.lto}%{?dist}
 License:        GPL-2.0-only
 URL:            https://cachyos.org
 
 Requires:       kernel-core-uname-r = %{_kver}
 Requires:       kernel-modules-uname-r = %{_kver}
 Requires:       kernel-modules-core-uname-r = %{_kver}
-Provides:       kernel-cachyos-rt%{?_lto_args:-lto} > 6.12.9-cbrt1.0%{?_lto_args:.lto}%{?dist}
+Provides:       kernel-cachyos-server%{?_lto_args:-lto} > 6.12.9-cbrt1.0%{?_lto_args:.lto}%{?dist}
 Provides:       installonlypkg(kernel)
-Obsoletes:      kernel-cachyos-rt%{?_lto_args:-lto} <= 6.12.9-cbrt1.0%{?_lto_args:.lto}%{?dist}
+Obsoletes:      kernel-cachyos-server%{?_lto_args:-lto} <= 6.12.9-cbrt1.0%{?_lto_args:.lto}%{?dist}
 
 BuildRequires:  bc
 BuildRequires:  bison
@@ -115,7 +115,7 @@ BuildRequires:  gcc-c++
 
 # Indexes 0-9 are reserved for the kernel. 10-19 will be reserved for NVIDIA
 Source0:        https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-%{_tarkver}.tar.xz
-Source1:        https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos-rt-bore/config
+Source1:        https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos-server/config
 
 %if %{_build_minimal}
 # The default modprobed.db provided is used for linux-cachyos CI.
@@ -129,8 +129,6 @@ Source10:       https://github.com/NVIDIA/open-gpu-kernel-modules/archive/%{_nv_
 %endif
 
 Patch0:         %{_patch_src}/all/0001-cachyos-base-all.patch
-Patch1:         %{_patch_src}/sched/0001-bore-cachy.patch
-Patch2:         %{_patch_src}/misc/0001-rt-i915.patch
 
 %if %{_build_lto}
 Patch2:         %{_patch_src}/misc/dkms-clang.patch
@@ -150,9 +148,9 @@ Patch10:        %{_patch_src}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-
     cp %{SOURCE1} .config
 
     # Default configs to always enable
-    # Enable CACHY sauce and the scheduler
+    # Enable CACHY sauce
     # used in the default linux-cachyos kernel
-    scripts/config -e CACHY -e SCHED_BORE
+    scripts/config -e CACHY
 
     # Use SElinux by default
     # https://github.com/sirlucjan/copr-linux-cachyos/pull/1
@@ -161,9 +159,8 @@ Patch10:        %{_patch_src}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-
     # Do not change the system's hostname
     scripts/config -u DEFAULT_HOSTNAME
 
-    # Enable PREEMPT_RT
-    scripts/config -e PREEMPT_LAZY
-    scripts/config -e PREEMPT_RT
+    # Disable PREEMP
+    scripts/config -d PREEMPT_DYNAMIC -d PREEMPT -d PREEMPT_VOLUNTARY -d PREEMPT_LAZY -e PREEMPT_NONE
 
     case %{_hz_tick} in
         100|250|300|500|600|750|1000)
@@ -334,7 +331,7 @@ cd ..
     %endif
 
 %package core
-Summary:        Linux BORE Cachy Sauce Kernel by CachyOS with other patches and improvements
+Summary:        Linux EEVDF scheduler Kernel by CachyOS targeted for Servers workloads
 AutoReq:        no
 Conflicts:      xfsprogs < 4.3.0-1
 Conflicts:      xorg-x11-drv-vmmouse < 13.0.99

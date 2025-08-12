@@ -11,7 +11,7 @@
 
 # Linux Kernel Versions
 %define _basekver 6.12
-%define _stablekver 30
+%define _stablekver 41
 %define _rpmver %{version}-%{release}
 %define _kver %{_rpmver}.%{_arch}
 
@@ -34,10 +34,12 @@
 %define _nv_pkg open-gpu-kernel-modules-%{_nv_ver}
 %if 0%{?fedora} >= 43
     %define _build_nv 1
-    %define _nv_ver 575.51.02
+    %define _nv_ver 575.64.05
+%elif 0%{?rhel}
+    %define _build_nv 0
 %else
     %define _build_nv 1
-    %define _nv_ver 570.144
+    %define _nv_ver 575.64.05
     %define _nv_old 1
 %endif
 
@@ -135,9 +137,6 @@ Patch2:         %{_patch_src}/misc/dkms-clang.patch
 
 %if %{_build_nv}
 Patch10:        %{_patch_src}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-by-default.patch
-%if !%{_build_lto}
-Patch11:        https://raw.githubusercontent.com/CachyOS/copr-linux-cachyos/refs/heads/master/sources/kernel-cachyos-bore/patches/nvidia/%{_nv_ver}/nvidia-gcc15.patch
-%endif
 %endif
 
 %description
@@ -175,6 +174,13 @@ Patch11:        https://raw.githubusercontent.com/CachyOS/copr-linux-cachyos/ref
         echo "Invalid x86_64 ISA Level. Using x86_64_v3"
         scripts/config --set-val X86_64_VERSION 3
     %endif
+
+    # Enable Secure boot support
+    scripts/config -e CONFIG_IMA_SECURE_AND_OR_TRUSTED_BOOT
+    scripts/config -e CONFIG_IMA
+    scripts/config -e CONFIG_IMA_APPRAISE_BOOTPARAM
+    scripts/config -e CONFIG_IMA_APPRAISE
+    scripts/config -e CONFIG_IMA_ARCH_POLICY
 
     %if %{_build_lto}
         scripts/config -e LTO_CLANG_THIN
