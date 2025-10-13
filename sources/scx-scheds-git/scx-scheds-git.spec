@@ -1,12 +1,12 @@
 %global _default_patch_fuzz 2
-%global commitdate 20250801
-%global commit 34011cc49a66c5cd5fab9092583145bc34d861e2
+%global commitdate 20251013
+%global commit fab9229552c5eb72f4f1b14edcbd6cec0ed55f41
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %define _disable_source_fetch 0
 
 Name:           scx-scheds-git
-Version:        1.0.14.%{commitdate}.git.%{shortcommit}
+Version:        1.0.17.%{commitdate}.git.%{shortcommit}
 Release:        1%{?dist}
 Summary:        Sched_ext Schedulers and Tools
 
@@ -70,10 +70,8 @@ sched_ext is a Linux kernel feature which enables implementing kernel thread sch
 
 
 %files
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/default/scx
 %{_bindir}/*
 %{_prefix}/lib/systemd/system/scx_loader.service
-%{_prefix}/lib/systemd/system/scx.service
 %{_datadir}/dbus-1/system.d/org.scx.Loader.conf
 %{_datadir}/dbus-1/system-services/org.scx.Loader.service
 %{_datadir}/scx_loader/config.toml
