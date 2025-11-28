@@ -1,12 +1,12 @@
 %global _default_patch_fuzz 2
-%global commitdate 20251024
-%global commit 7b79575215577a311187835ba8af185e5b8ce3e9
+%global commitdate 20251127
+%global commit 365d85d48f4315e94562cd307223234e71b161b8
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %define _disable_source_fetch 0
 
 Name:           scx-scheds-git
-Version:        1.0.17.%{commitdate}.git.%{shortcommit}
+Version:        1.0.18.%{commitdate}.git.%{shortcommit}
 Release:        1%{?dist}
 Summary:        Sched_ext Schedulers and Tools
 
@@ -16,7 +16,6 @@ Source0:        %{URL}/archive/%{commit}/scx-%{commit}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  git
-BuildRequires:  meson >= 1.2
 BuildRequires:  python
 BuildRequires:  cargo
 BuildRequires:  rust
@@ -37,19 +36,16 @@ Requires:  libseccomp
 Requires:  protobuf
 Requires:  zlib
 Requires:  jq
-Obsoletes: scxctl >= 0.3.4
+Requires:  scx-tools
 Conflicts: scx-scheds
 Conflicts: scx_layered
 Conflicts: scx_rustland
 Conflicts: scx_rusty
-Conflicts: scx_c_schedulers
 Conflicts: rust-scx_utils-devel
 Provides: scx-scheds = %{version}
-Provides: scxctl = %{version}
 Provides: scx_layered
 Provides: scx_rustland
 Provides: scx_rusty
-Provides: scx_c_schedulers
 Provides: rust-scx_utils-devel
 
 %description
@@ -59,30 +55,29 @@ sched_ext is a Linux kernel feature which enables implementing kernel thread sch
 %autosetup -p1 -n scx-%{commit}
 
 %build
-%meson \
- -Dforce_meson=true \
- -Dsystemd=enabled \
- -Dopenrc=disabled
-%meson_build
-
+export CARGO_HOME=%{_builddir}/.cargo
+cargo fetch --locked
+cargo build \
+     --release \
+     --frozen \
+     --all-features \
+     --workspace \
+     --exclude scx_rlfifo \
+     --exclude scx_mitosis \
+     --exclude scx_wd40 \
+     --exclude xtask \
+     --exclude scxcash \
+     --exclude vmlinux_docify \
+     --exclude scx_arena_selftests
 
 %install
-%meson_install
 
+# Install all built executables (skip .so and .d files)
+find target/release \
+    -maxdepth 1 -type f -executable ! -name '*.so' \
+    -exec install -Dm755 -t %{buildroot}%{_bindir} {} +
 
 %files
+
+# Binaries
 %{_bindir}/*
-%{_prefix}/lib/systemd/system/scx_loader.service
-%{_datadir}/dbus-1/system.d/org.scx.Loader.conf
-%{_datadir}/dbus-1/system-services/org.scx.Loader.service
-%{_datadir}/scx_loader/config.toml
-
-
-%package devel
-Summary:        Development files for %{name}
-
-%description devel
-The %{name}-devel package contains libraries header files for developing applications that use %{name}
-
-%files devel
-%{_includedir}/scx/
