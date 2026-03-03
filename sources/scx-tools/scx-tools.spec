@@ -1,8 +1,12 @@
 %define _disable_source_fetch 0
 
+%if 0%{?rhel}
+%global debug_package %{nil}
+%endif
+
 Name:           scx-tools
-Version:        1.0.18
-Release:        2%{?dist}
+Version:        1.0.20
+Release:        1%{?dist}
 Summary:        Sched_ext Tools
 
 License:        GPL=2.0
@@ -23,6 +27,7 @@ BuildRequires:  libseccomp-devel
 Requires:  scx-scheds
 Obsoletes: scxctl = 0.3.4
 Provides: scxctl = %{version}
+Conflicts: scx-tools-git
 
 %description
 scx_loader: A DBUS Interface for Managing sched_ext Schedulers
@@ -57,6 +62,7 @@ find target/release \
 # DBus service and configuration
 %{_datadir}/dbus-1/system-services/org.scx.Loader.service
 %{_datadir}/dbus-1/system.d/org.scx.Loader.conf
+%{_datadir}/dbus-1/interfaces/org.scx.Loader.xml
 
 # Polkit authorization policy for scx-loader
 %{_datadir}/polkit-1/actions/org.scx.Loader.policy

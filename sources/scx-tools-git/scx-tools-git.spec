@@ -1,12 +1,12 @@
 %global _default_patch_fuzz 2
-%global commitdate 20251128
-%global commit b60b6a95bdee4419634e60978db0597f2a9ca710
+%global commitdate 20260218
+%global commit 30b4540650f0283136c875efb4cd449686a87995
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %define _disable_source_fetch 0
 
 Name:           scx-tools-git
-Version:        1.0.18.%{commitdate}.git.%{shortcommit}
+Version:        1.0.20.%{commitdate}.git.%{shortcommit}
 Release:        1%{?dist}
 Summary:        Sched_ext Tools
 
@@ -29,6 +29,7 @@ Requires:  scx-scheds
 Obsoletes: scxctl = 0.3.4
 Provides: scxctl = %{version}
 Provides: scx-tools = %{version}
+Conflicts: scx-tools
 
 %description
 scx_loader: A DBUS Interface for Managing sched_ext Schedulers
